@@ -1,0 +1,4 @@
+date	size'/'remotesize	flags(request:Update,Range state:File response:Modified,Chunked,gZipped)	statuscode	status ('servermsg')	MIME	Etag|Date	URL	localfile	(from URL)
+20:18:38	1478/1478	---MCZ	404	error ('Not%20Found')	text/html	date:Sat,%2018%20Apr%202026%2014:48:34%20GMT	https://ashish-and-ayushi.vercel.app/robots.txt		(from )
+20:18:38	71198/71198	---MCZ	200	added ('OK')	text/html	etag:W/%222ee450ac23d266b0764fd0a2a7afc62c%22	https://ashish-and-ayushi.vercel.app/	C:/My%20Web%20Sites/marriage-invitation/ashish-and-ayushi.vercel.app/index.html	(from )
+20:18:40	126623/126623	---M--	200	added ('OK')	image/png	etag:%220c4c431d691f407b2efd6c3ec9975546%22	https://pub-1953a6673e864f3488c645252f75de98.r2.dev/Shriya%20%26%20Ashutosh/Vianyak%20png.png	C:/My%20Web%20Sites/marriage-invitation/pub-1953a6673e864f3488c645252f75de98.r2.dev/Shriya%20&%20Ashutosh/Vianyak%20png.png	(from https://ashish-and-ayushi.vercel.app/)
