@@ -466,41 +466,92 @@
             font-size: clamp(3rem, 10vw, 5rem);
             line-height: 1.1;
         }
-        .memories-frame {
-            max-width: 420px;
-            margin: 3rem auto 0;
+        .memories-stack-wrapper {
+            height: 250vh;
             position: relative;
+            margin: 3rem 0 0;
         }
-        /* Decorative tilted background frame */
-        .memories-frame::before {
+        .memories-stack-sticky {
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 1.5rem;
+            overflow: visible;
+        }
+        .memory-fan-area {
+            position: relative;
+            width: min(340px, 82vw);
+            height: min(453px, 110vw); /* 3:4 ratio */
+        }
+        /* decorative gold border — same as the original video frame */
+        .memory-fan-area::before {
             content: '';
             position: absolute;
-            inset: -12px;
+            inset: -10px;
             border: 1px solid rgba(201,150,62,0.35);
             border-radius: 2rem;
             transform: rotate(2deg);
+            pointer-events: none;
         }
-        .memories-frame::after {
+        .memory-fan-area::after {
             content: '';
             position: absolute;
-            inset: -6px;
+            inset: -5px;
             border: 1px solid rgba(201,150,62,0.2);
             border-radius: 1.8rem;
             transform: rotate(-1deg);
+            pointer-events: none;
         }
-        .memories-inner {
-            position: relative;
-            z-index: 1;
+        @media (max-width: 480px) {
+            .memories-stack-sticky { gap: 1rem; }
+            .memory-fan-area {
+                width: min(300px, 80vw);
+                height: min(400px, 107vw);
+            }
+        }
+        .memory-fan-card {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            transform-origin: center center;
             border-radius: 1.5rem;
             overflow: hidden;
             border: 1px solid var(--border);
             box-shadow: var(--shadow-warm);
+            will-change: transform;
         }
-        .memories-inner video {
+        /* stacking order: Rajesh on top, couple at bottom */
+        .memory-fan-card:nth-child(1) { z-index: 3; transform-origin: bottom center; }
+        .memory-fan-card:nth-child(2) { z-index: 2; transform-origin: bottom center; }
+        .memory-fan-card:nth-child(3) { z-index: 1; transform-origin: center center; }
+        .memory-fan-card img {
             width: 100%;
-            display: block;
-            aspect-ratio: 1080/1600;
+            height: 100%;
             object-fit: cover;
+            display: block;
+            pointer-events: none;
+        }
+        .memory-stack-dots {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+        .memory-stack-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: rgba(201,150,62,0.3);
+            transition: background 0.4s ease, transform 0.4s ease;
+        }
+        .memory-stack-dot.active {
+            background: var(--gold);
+            transform: scale(1.3);
         }
 
         /* ============================================================
@@ -1151,7 +1202,7 @@
             </p>
 
             <div class="couple-block">
-                <span class="couple-name shimmer-gold">Rajesh</span>
+                <span class="couple-name shimmer-gold" data-i18n="groom_name">Rajesh</span>
                 <p class="family-line" data-i18n="hero_groom_family">Son of Mr. Vemulapalli Srinivas & Mrs. Ganga Ratnam</p>
                 <!-- <p class="family-subline">(Grandson of Late Shri Om Prakash Gupta & Late Smt. Omwati Gupta)</p> -->
             </div>
@@ -1163,7 +1214,7 @@
             </div>
 
             <div class="couple-block">
-                <span class="couple-name shimmer-gold">Prathyusha</span>
+                <span class="couple-name shimmer-gold" data-i18n="bride_name">Prathyusha</span>
                 <p class="family-line" data-i18n="hero_bride_family">Daughter of Mr. Parimi Srinivasa Rao & Mrs. Anuradha</p>
                 <!-- <p class="family-subline">(Granddaughter of Late Shri Rajendra Prasad Mishra & Smt. Shakuntala Mishra)</p> -->
             </div>
@@ -1217,11 +1268,24 @@
             </div>
         </div>
 
-        <div class="memories-frame reveal reveal-delay-2">
-            <div class="memories-inner">
-                <video autoplay loop muted playsinline>
-                    <source src="https://pub-1953a6673e864f3488c645252f75de98.r2.dev/Ashish %26 Ayushi/Ashish %26 Ayushi swiper  (2).mp4" type="video/mp4">
-                </video>
+        <div class="memories-stack-wrapper">
+            <div class="memories-stack-sticky">
+                <div class="memory-fan-area">
+                    <div class="memory-fan-card">
+                        <img src="../public/rajesh.jpeg" alt="Rajesh">
+                    </div>
+                    <div class="memory-fan-card">
+                        <img src="../public/prathyusha.jpeg" alt="Prathyusha">
+                    </div>
+                    <div class="memory-fan-card">
+                        <img src="../public/rajesh-and-prathyusha.jpeg" alt="Rajesh &amp; Prathyusha">
+                    </div>
+                </div>
+                <div class="memory-stack-dots">
+                    <div class="memory-stack-dot active"></div>
+                    <div class="memory-stack-dot"></div>
+                    <div class="memory-stack-dot"></div>
+                </div>
             </div>
         </div>
 
@@ -1246,8 +1310,8 @@
         <div class="venue-card reveal reveal-delay-2">
             <video class="venue-video" src="https://lh3.googleusercontent.com/gps-cs-s/APNQkAF-ywVauVW0Ck7GpCfbknR9eEi-TttB5kxik3fhByHI_b5nzXUH2N_10trS8i9q3K6IuYN--Pk9oYngMb-Hz446dS2z1I2hMDLL7SWBTzc6a0Jjr5rOJL3W1uNVcxAIKCHLk7B88Q=m18?cpn=eOZORAJK-A2B4GtC" poster="https://lh3.googleusercontent.com/gps-cs-s/APNQkAF-ywVauVW0Ck7GpCfbknR9eEi-TttB5kxik3fhByHI_b5nzXUH2N_10trS8i9q3K6IuYN--Pk9oYngMb-Hz446dS2z1I2hMDLL7SWBTzc6a0Jjr5rOJL3W1uNVcxAIKCHLk7B88Q=w203-h114-k-no" autoplay muted loop playsinline></video>
             <div class="venue-info text-center">
-                <h3 class="venue-name">Raja Rani Function Hall</h3>
-                <p class="venue-address"> 
+                <h3 class="venue-name" data-i18n="venue_name">Raja Rani Function Hall</h3>
+                <p class="venue-address" data-i18n="venue_address">
                     48M3+CVR, buttayagudam Road, Jangareddygudem,<br>
                     Eluru Dist, Andhra Pradesh 534447
                 </p>
@@ -1285,7 +1349,7 @@
                 <!-- <video autoplay muted loop playsinline>
                     <source src="https://pub-1953a6673e864f3488c645252f75de98.r2.dev/Ashish %26 Ayushi/136.mp4" type="video/mp4">
                 </video> -->
-                <img src="../public/mehndi.jpeg" alt="Mehndi Celebration">
+                <img src="../public/mehndi-english.jpeg" alt="Mehndi Celebration" data-img-en="../public/mehndi-english.jpeg" data-img-te="../public/mehndi-telugu.jpeg">
             </div>
         </div>
         <div class="event-sep reveal"><div class="event-sep-line"></div><div class="event-sep-dot"></div><div class="event-sep-line"></div></div>
@@ -1309,9 +1373,10 @@
                 <h3 class="event-title" data-i18n="c2_title">A Starry Musical Evening</h3>
             </div>
             <div class="event-video-wrap">
-                <video autoplay muted loop playsinline>
+                <!-- <video autoplay muted loop playsinline>
                     <source src="https://pub-1953a6673e864f3488c645252f75de98.r2.dev/Ashish %26 Ayushi/138.mp4" type="video/mp4">
-                </video>
+                </video> -->
+                <img src="../public/sangeet-english.png" alt="Musical Evening" data-img-en="../public/sangeet-english.png" data-img-te="../public/sangeet-telugu.png">
             </div>
         </div>
         <div class="event-sep reveal"><div class="event-sep-line"></div><div class="event-sep-dot"></div><div class="event-sep-line"></div></div>
@@ -1325,7 +1390,7 @@
                     <!-- <video autoplay muted loop playsinline>
                         <source src="https://pub-1953a6673e864f3488c645252f75de98.r2.dev/Ashish %26 Ayushi/139.mp4" type="video/mp4">
                     </video> -->
-                    <img src="../public/haldi.jpeg" alt="Haldi Ceremony">
+                    <img src="../public/haldi-english.png" alt="Haldi Ceremony" data-img-en="../public/haldi-english.png" data-img-te="../public/haldi-telugu.png">
             </div>
         </div>
         <div class="event-sep reveal"><div class="event-sep-line"></div><div class="event-sep-dot"></div><div class="event-sep-line"></div></div>
@@ -1339,7 +1404,7 @@
                 <!-- <video autoplay muted loop playsinline>
                     <source src="https://pub-1953a6673e864f3488c645252f75de98.r2.dev/Ashish %26 Ayushi/140.mp4" type="video/mp4">
                 </video> -->
-                <img src="../public/wedding-English.jpeg" alt="Wedding Ceremony">
+                <img src="../public/wedding-English.jpeg" alt="Wedding Ceremony" data-img-en="../public/wedding-English.jpeg" data-img-te="../public/wedding-telugu.jpeg">
             </div>
         </div>
         <div class="event-sep reveal"><div class="event-sep-line"></div><div class="event-sep-dot"></div><div class="event-sep-line"></div></div>
@@ -1653,6 +1718,7 @@ function revealMain() {
     document.body.style.overflow = 'auto';
     initReveal();
     initCountdown();
+    initMemoryStack();
     initEventAutoExpand();
 }
 
@@ -1750,6 +1816,57 @@ function initReveal() {
         });
     }, { threshold: 0.12 });
     els.forEach(el => io.observe(el));
+}
+
+/* ================================================================
+   MEMORY PEEL SCROLL
+================================================================ */
+function initMemoryStack() {
+    const wrapper = document.querySelector('.memories-stack-wrapper');
+    const cards   = document.querySelectorAll('.memory-fan-card');
+    const dots    = document.querySelectorAll('.memory-stack-dot');
+    if (!wrapper || !cards.length) return;
+
+    const ANGLE  = 10;   // tilt degrees when peeling off
+    const SHRINK = 0.42; // scale after peel
+    const SHIFT_X = () => Math.min(160, window.innerWidth * 0.40);
+    const SHIFT_Y = () => Math.min(70,  window.innerHeight * 0.09);
+
+    function easeOut(t) { return 1 - Math.pow(1 - t, 3); }
+    function clamp(v)   { return Math.max(0, Math.min(1, v)); }
+
+    function update() {
+        const rect       = wrapper.getBoundingClientRect();
+        const scrollable = wrapper.offsetHeight - window.innerHeight;
+        const progress   = Math.max(0, Math.min(1, -rect.top / scrollable));
+        const sx         = SHIFT_X();
+        const sy         = SHIFT_Y();
+
+        // p1: first half  — Rajesh peels off left
+        const p1 = easeOut(clamp(progress / 0.5));
+        // p2: second half — Prathyusha peels off right
+        const p2 = easeOut(clamp((progress - 0.5) / 0.5));
+
+        // Card 0 (Rajesh, z:3) — rotates from bottom-center, pushed left + down
+        const s0 = 1 - (1 - SHRINK) * p1;
+        cards[0].style.transform =
+            `translateX(${-sx * p1}px) translateY(${sy * p1}px) rotate(${-ANGLE * p1}deg) scale(${s0})`;
+
+        // Card 1 (Prathyusha, z:2) — slightly bigger than card 0 after shrink
+        const s1 = 1 - (1 - (SHRINK + 0.08)) * p2;
+        cards[1].style.transform =
+            `translateX(${sx * p2}px) translateY(${sy * p2}px) rotate(${ANGLE * p2}deg) scale(${s1})`;
+
+        // Card 2 (Couple, z:1) — always centered, never moves
+        cards[2].style.transform = `none`;
+
+        const di = progress < 0.4 ? 0 : progress < 0.85 ? 1 : 2;
+        dots.forEach((d, i) => d.classList.toggle('active', i === di));
+    }
+
+    window.addEventListener('scroll', update, { passive: true });
+    window.addEventListener('resize', update, { passive: true });
+    update();
 }
 
 /* ================================================================
@@ -1853,10 +1970,14 @@ modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
 ================================================================ */
 const translations = {
     en: {
+        groom_name: 'Rajesh',
+        bride_name: 'Prathyusha',
         hero_blessing: 'With the blessings of the Almighty & our respected elders,<br>we joyfully request your gracious presence on the wedding celebration of',
         hero_groom_family: 'Son of Mr. Vemulapalli Srinivas & Mrs. Ganga Ratnam',
         hero_bride_family: 'Daughter of Mr. Parimi Srinivasa Rao & Mrs. Anuradha',
         hero_scroll: 'Scroll',
+        venue_name: 'Raja Rani Function Hall',
+        venue_address: '48M3+CVR, buttayagudam Road, Jangareddygudem,<br>Eluru Dist, Andhra Pradesh 534447',
         countdown_label: 'The Big Day',
         countdown_quote: 'The start of a beautiful journey, shared with the ones we love most',
         countdown_date: 'wednesday · 13th May 2026',
@@ -1904,10 +2025,14 @@ const translations = {
         footer_date: '11-13th May, Mon-Wed 2026 · Jangareddygudem, Andhra Pradesh',
     },
     te: {
+        groom_name: 'రాజేష్',
+        bride_name: 'ప్రత్యూష',
         hero_blessing: 'సర్వేశ్వరుని కృపతో మరియు మా పూజ్య పెద్దల ఆశీర్వాదంతో,<br>మీ శుభాగమనాన్ని మేము ఆనందంగా కోరుతున్నాం',
         hero_groom_family: 'శ్రీ వేముళపల్లి శ్రీనివాస్ & శ్రీమతి గంగారత్నం కుమారుడు',
         hero_bride_family: 'శ్రీ పరిమి శ్రీనివాస రావు & శ్రీమతి అనురాధ కుమార్తె',
         hero_scroll: 'స్క్రోల్',
+        venue_name: 'రాజా రాణి ఫంక్షన్ హాల్',
+        venue_address: '48M3+CVR, బుత్తాయగూడెం రోడ్, జంగారెడ్డిగూడెం,<br>ఏలూరు జిల్లా, ఆంధ్రప్రదేశ్ 534447',
         countdown_label: 'శుభ ముహూర్తం',
         countdown_quote: 'మనం ప్రేమించే వారితో పంచుకునే అందమైన జీవన ప్రయాణం',
         countdown_date: 'బుధవారం · 13 మే 2026',
@@ -1964,6 +2089,9 @@ function applyLanguage(lang) {
     document.querySelectorAll('[data-i18n-ph]').forEach(el => {
         const key = el.getAttribute('data-i18n-ph');
         if (translations[lang][key] !== undefined) el.placeholder = translations[lang][key];
+    });
+    document.querySelectorAll('img[data-img-en][data-img-te]').forEach(img => {
+        img.src = lang === 'te' ? img.dataset.imgTe : img.dataset.imgEn;
     });
     document.querySelectorAll('.lang-btn').forEach(btn => {
         btn.classList.toggle('active', btn.dataset.lang === lang);
