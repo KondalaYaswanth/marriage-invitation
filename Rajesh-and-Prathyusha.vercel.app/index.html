@@ -339,10 +339,11 @@
         .couple-name {
             font-family: 'Pinyon Script', cursive;
             font-size: clamp(3rem, 11vw, 4.8rem);
-            line-height: 1.1;
+            line-height: 1.3;
             display: block;
             letter-spacing: 0.02em;
-            padding: 0.2rem 0;
+            padding: 0.4rem 0.1rem;
+            overflow: visible;
         }
 
         .family-line {
@@ -1531,21 +1532,21 @@
                             <span data-i18n="rsvp_day1">Day 1: Mehndi & Sangeet Celebrations</span>
                             <small class="checkbox-date" data-i18n="rsvp_day1_date">Monday, 11th May 2026</small>
                         </div>
-                        <input type="checkbox" name="attending_events" value="27th April">
+                        <input type="checkbox" name="attending_events" value="11th May">
                     </label>
                     <label class="checkbox-pill">
                         <div>
                             <span data-i18n="rsvp_day2">Day 2: Haldi Celebration</span>
                             <small class="checkbox-date" data-i18n="rsvp_day2_date">Tuesday, 12th May 2026</small>
                         </div>
-                        <input type="checkbox" name="attending_events" value="27th April">
+                        <input type="checkbox" name="attending_events" value="12th May">
                     </label>
                     <label class="checkbox-pill">
                         <div>
                             <span data-i18n="rsvp_day3">Day 3: The Wedding Day</span>
                             <small class="checkbox-date" data-i18n="rsvp_day3_date">Wednesday, 13th May 2026</small>
                         </div>
-                        <input type="checkbox" name="attending_events" value="28th April">
+                        <input type="checkbox" name="attending_events" value="13th May">
                     </label>
                 </div>
             </div>
@@ -1616,7 +1617,7 @@
     <section id="footer-section">
         <div style="text-align:center;margin-bottom:3rem;" class="reveal">
             <span style="font-family:'Great Vibes',cursive;font-size:4rem;color:var(--gold-light);display:block;line-height:1.1;">
-                Rajesh & Prathyusha
+                #RASHA
             </span>
             <div style="display:flex;align-items:center;justify-content:center;gap:1rem;margin-top:1rem;opacity:0.4;">
                 <div style="height:1px;width:60px;background:var(--gold-light);"></div>
@@ -1974,18 +1975,20 @@ rsvpForm.addEventListener('submit', async (e) => {
     btnText.textContent = 'Sending...';
     btnSpinner.style.display = 'inline';
 
-    const data = Object.fromEntries(new FormData(e.target).entries());
-    data.clientId = 'ashish-ayushi-wedding-2026';
+    const fd = new FormData(e.target);
+    const data = Object.fromEntries(fd.entries());
+    data.attending_events = fd.getAll('attending_events');
 
     try {
-        const res  = await fetch('https://wedding-backend-k67l.onrender.com/api/rsvp', {
+        await fetch('https://script.google.com/macros/s/AKfycbwsua_G3b72uRRQLwJ9cIA2No5b4_UNnRFCLyyojDK8EwFcp4slX9uXPwmfYlhdh2s0nA/exec', {
             method: 'POST',
+            mode: 'no-cors',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(data),
         });
-        const result = await res.json();
-        showModal(result.success ? 'success' : 'error');
-        if (result.success) e.target.reset();
+        /* no-cors means response is opaque — assume success if no exception thrown */
+        showModal('success');
+        e.target.reset();
     } catch(err) {
         console.error(err);
         showModal('error');
