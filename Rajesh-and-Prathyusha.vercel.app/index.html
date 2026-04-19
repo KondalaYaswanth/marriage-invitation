@@ -153,6 +153,34 @@
             object-fit: cover;
         }
         #entry-gate.fade-out { opacity: 0; pointer-events: none; }
+        #entry-tap-hint {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            color: rgba(255,255,255,0.85);
+            font-family: 'Tenor Sans', sans-serif;
+            font-size: 0.9rem;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            pointer-events: none;
+            transition: opacity 0.4s ease;
+        }
+        #entry-gate.video-playing #entry-tap-hint { opacity: 0; }
+        .entry-hint-ring {
+            width: 56px;
+            height: 56px;
+            border: 2px solid rgba(201,150,62,0.7);
+            border-radius: 50%;
+            animation: entry-pulse 1.8s ease-in-out infinite;
+        }
+        @keyframes entry-pulse {
+            0%, 100% { transform: scale(1);   opacity: 1; }
+            50%       { transform: scale(1.2); opacity: 0.5; }
+        }
 
         /* ============================================================
            AUDIO TOGGLE
@@ -1181,10 +1209,14 @@
 </div>
 
 <div id="entry-gate">
-    <video id="entry-video" playsinline preload="auto" muted>
+    <video id="entry-video" playsinline webkit-playsinline preload="auto" muted
+           poster="../public/envelope.jpeg">
         <source src="../public/Envelope.mp4" type="video/mp4">
     </video>
-    
+    <div id="entry-tap-hint">
+        <div class="entry-hint-ring"></div>
+        <span>Tap to Open</span>
+    </div>
 </div>
 
 <div id="main-content">
@@ -1740,8 +1772,11 @@ gate.addEventListener('click', async (e) => {
     if (entryVideo.paused) {
         try {
             gate.classList.add('video-playing');
-            // FIX: Unmute right before playing. Allowed in Safari because this is a direct user gesture (click)!
-            entryVideo.muted = false; 
+            entryVideo.muted = false;
+            /* iOS Safari ignores preload, so force a load() inside the gesture handler
+               before play() to avoid the black-screen buffering delay */
+            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+            if (isIOS) { entryVideo.load(); }
             await entryVideo.play();
             try { await bgAudio.play(); audioPlaying = true; updateAudioIcon(); } catch(_) {}
         } catch(e) {
