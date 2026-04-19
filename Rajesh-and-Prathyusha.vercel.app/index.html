@@ -4,7 +4,7 @@
 <meta http-equiv="content-type" content="text/html;charset=utf-8" />
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Rajesh & Prathyusha — A Sacred Union</title>
     <link rel="icon" type="image/x-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💕</text></svg>">
     <link rel="preconnect" href="https://fonts.googleapis.com/">
@@ -458,8 +458,12 @@
            PHOTO / VIDEO SECTION
         ============================================================ */
         #memories-section {
-            padding: 5rem 1.5rem;
+            padding: 3rem 1.5rem 4rem;
             background: var(--cream-2);
+            overflow-x: clip; /* clip fanned cards without creating scroll container */
+        }
+        @media (max-width: 480px) {
+            #memories-section { padding: 2rem 1rem 3rem; }
         }
         .section-heading {
             font-family: 'Great Vibes', cursive;
@@ -467,25 +471,39 @@
             line-height: 1.1;
         }
         .memories-stack-wrapper {
-            height: 250vh;
+            height: clamp(180vh, 220vh, 250vh);
             position: relative;
             margin: 0.5rem 0 0;
+        }
+        @media (max-width: 480px) {
+            .memories-stack-wrapper { height: 170vh; }
+        }
+        @media (max-width: 390px) {
+            .memories-stack-wrapper { height: 160vh; }
         }
         .memories-stack-sticky {
             position: sticky;
             top: 0;
-            height: 100vh;
+            height: 100svh; /* svh avoids mobile browser chrome */
+            height: 100vh;  /* fallback for older browsers */
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             gap: 1.5rem;
             overflow: visible;
+            background: var(--cream-2);
+        }
+        @supports (height: 100svh) {
+            .memories-stack-sticky { height: 100svh; }
+        }
+        @media (max-width: 480px) {
+            .memories-stack-sticky { gap: 0.75rem; }
         }
         .memory-fan-area {
             position: relative;
-            width: min(340px, 82vw);
-            height: min(453px, 110vw); /* 3:4 ratio */
+            width: clamp(240px, 72vw, 340px);
+            height: clamp(320px, 96vw, 453px); /* 3:4 ratio */
         }
         /* decorative gold border — same as the original video frame */
         .memory-fan-area::before {
@@ -506,13 +524,6 @@
             transform: rotate(-1deg);
             pointer-events: none;
         }
-        @media (max-width: 480px) {
-            .memories-stack-sticky { gap: 1rem; }
-            .memory-fan-area {
-                width: min(300px, 80vw);
-                height: min(400px, 107vw);
-            }
-        }
         .memory-fan-card {
             position: absolute;
             width: 100%;
@@ -524,7 +535,6 @@
             overflow: hidden;
             border: 1px solid var(--border);
             box-shadow: var(--shadow-warm);
-            will-change: transform;
         }
         /* stacking order: Rajesh on top, couple at bottom */
         .memory-fan-card:nth-child(1) { z-index: 3; transform-origin: bottom center; }
@@ -1114,10 +1124,12 @@
         ============================================================ */
         #lang-switcher {
             position: fixed;
-            bottom: 1.5rem;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 900;
+            bottom: calc(1.5rem + env(safe-area-inset-bottom, 0px));
+            left: 0;
+            right: 0;
+            width: fit-content;
+            margin: 0 auto;
+            z-index: 9999;
             background: var(--burgundy);
             border: 1px solid rgba(201,150,62,0.35);
             border-radius: 9999px;
@@ -1720,6 +1732,7 @@ function revealMain() {
     initCountdown();
     initMemoryStack();
     initEventAutoExpand();
+    initLangSwitcherPos();
 }
 
 gate.addEventListener('click', async (e) => {
@@ -1803,6 +1816,14 @@ function initCountdown() {
 }
 
 /* ================================================================
+   LANG SWITCHER CENTERING (JS-driven, avoids CSS transform issues)
+================================================================ */
+function initLangSwitcherPos() {
+    // CSS handles centering via left:0;right:0;width:fit-content;margin:0 auto
+    // No JS needed — removing scroll/resize listeners avoids mid-animation glitches
+}
+
+/* ================================================================
    SCROLL REVEAL
 ================================================================ */
 function initReveal() {
@@ -1829,8 +1850,10 @@ function initMemoryStack() {
 
     const ANGLE  = 10;   // tilt degrees when peeling off
     const SHRINK = 0.42; // scale after peel
-    const SHIFT_X = () => Math.min(160, window.innerWidth * 0.40);
-    const SHIFT_Y = () => Math.min(70,  window.innerHeight * 0.09);
+    const fanArea = document.querySelector('.memory-fan-area');
+    /* shift is relative to fan-area width so cards never overflow on any screen */
+    const SHIFT_X = () => (fanArea ? fanArea.offsetWidth : Math.min(340, window.innerWidth * 0.72)) * 0.44;
+    const SHIFT_Y = () => Math.min(60, window.innerHeight * 0.07);
 
     function easeOut(t) { return 1 - Math.pow(1 - t, 3); }
     function clamp(v)   { return Math.max(0, Math.min(1, v)); }
